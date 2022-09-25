@@ -24,7 +24,6 @@ class DashboardViewModel @Inject constructor(
     init { getRecords() }
 
     private fun getRecords() {
-        Log.d("getRecords", "Called from ViewModel")
         viewModelScope.launch {
             repo.getRecords().collect { response ->
                 when (response) {

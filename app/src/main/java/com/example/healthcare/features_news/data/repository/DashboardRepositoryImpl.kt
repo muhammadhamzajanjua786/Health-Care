@@ -17,8 +17,6 @@ class DashboardRepositoryImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSource
 ) : HealthCareRepository {
 
-    fun deleteRecords() = CoroutineScope(Dispatchers.IO).launch { localDataSource.deleteRecords() }
-
     override suspend fun getRecords() = channelFlow {
         val dbSource = localDataSource.getRecords()
         if (dbSource.isNotEmpty()) {
@@ -35,4 +33,6 @@ class DashboardRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    fun deleteRecords() = CoroutineScope(Dispatchers.IO).launch { localDataSource.deleteRecords() }
 }
