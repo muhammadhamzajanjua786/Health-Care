@@ -15,14 +15,6 @@ object Utility {
     const val LOGOUT = "Logout."
     const val ERROR_MESSAGE = "Couldn't reach server, check your internet connection and try again!"
 
-    fun enableShimmer(isShown: Boolean, binding: FragmentDashboardBinding) {
-        if (isShown) {
-            binding.shimmer.visibility = View.VISIBLE
-        } else {
-            binding.shimmer.visibility = View.GONE
-        }
-    }
-
     fun isNetworkAvailable(context: Context): Boolean {
         (context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).run {
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
