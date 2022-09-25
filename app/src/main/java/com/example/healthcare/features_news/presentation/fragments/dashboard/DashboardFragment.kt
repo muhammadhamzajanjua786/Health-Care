@@ -1,7 +1,6 @@
 package com.example.healthcare.features_news.presentation.fragments.dashboard
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,7 +29,7 @@ class DashboardFragment : Fragment() {
     private val args: DashboardFragmentArgs by navArgs()
     private val viewModel: DashboardViewModel by activityViewModels()
     private lateinit var binding: FragmentDashboardBinding
-    private lateinit var mAdapter:DashboardAdapter
+    private lateinit var mAdapter: DashboardAdapter
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -69,17 +68,17 @@ class DashboardFragment : Fragment() {
         }
 
         viewModel.flow.onEach { response ->
-            when (response) {
-                is Resource.Success -> {
+            response
+                .onLoading { binding.shimmer.visibility }
+                .onSuccess {
                     binding.shimmer.gone()
                     binding.ll.visible()
-                    mAdapter.updateList(response.data!!)
+                    mAdapter.updateList(it)
                 }
-                is Resource.Error -> {
+                .onError {
                     binding.shimmer.gone()
-                    toast(response.exception.getError(requireContext()))
+                    toast(it.getError(requireContext()))
                 }
-            }
         }.launchIn(lifecycleScope)
         binding.apply {
             tvGreeting.text = greeting()

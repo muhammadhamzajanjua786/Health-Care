@@ -1,6 +1,7 @@
 package com.example.healthcare.features_news.data.repository
 
 import com.example.healthcare.common.Resource
+import com.example.healthcare.common.onFlowStarts
 import com.example.healthcare.domain.repository.HealthCareRepository
 import com.example.healthcare.features_news.data.local.LocalDataSource
 import com.example.healthcare.features_news.data.remote.RemoteDataSource
@@ -25,14 +26,14 @@ class DashboardRepositoryImpl @Inject constructor(
             remoteDataSource.getRecords().collect { response ->
                 when (response) {
                     is Resource.Success -> {
-                        send(Resource.Success(data = response.data!!.results))
+                        send(Resource.Success(data = response.data.results))
                         localDataSource.insertRecords(response.data.results.map { it.mapToEntity() })
                     }
                     is Resource.Error -> send(Resource.Error(response.exception))
                 }
             }
         }
-    }
+    }.onFlowStarts()
 
     fun deleteRecords() = CoroutineScope(Dispatchers.IO).launch { localDataSource.deleteRecords() }
 }
