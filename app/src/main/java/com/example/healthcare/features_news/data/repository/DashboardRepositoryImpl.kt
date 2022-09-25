@@ -16,7 +16,7 @@ class DashboardRepositoryImpl @Inject constructor(
     private val localDataSource: LocalDataSource,
     private val remoteDataSource: RemoteDataSource
 ) : HealthCareRepository {
-    
+
     override suspend fun getRecords() = channelFlow {
         val dbSource = localDataSource.getRecords()
         if (dbSource.isNotEmpty()) {
@@ -28,7 +28,7 @@ class DashboardRepositoryImpl @Inject constructor(
                         send(Resource.Success(data = response.data!!.results))
                         localDataSource.insertRecords(response.data.results.map { it.mapToEntity() })
                     }
-                    is Resource.Failure -> send(Resource.Failure(message = response.message))
+                    is Resource.Error -> send(Resource.Error(response.exception))
                 }
             }
         }

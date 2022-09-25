@@ -4,4 +4,12 @@
     <string name="email_error">The email can\'t be blank</string>
     <string name="pass_error">The password needs to contain at least one letter or digit</string>
     <string name="login_successful">Login Successful</string>
+
+    <!--Network Error-->
+    <string name="error_unexpected_message">Unexpected error occurred. We are working on it.</string>
+    <string name="error_client_unexpected_message">Something technically is wrong. We are working on it.</string>
+    <string name="error_server_unexpected_message">Oops! Something went wrong on the server. We are working on it.</string>
+    <string name="error_timeout_message">Looks like the server is taking to long to respond, this can be caused by either poor connectivity or an error with our servers. Please try again in a while</string>
+    <string name="error_network">Couldn\'t reach server, check your internet connection and try again!</string>
+    <string name="no_results_found">No results found!</string>
 </resources>

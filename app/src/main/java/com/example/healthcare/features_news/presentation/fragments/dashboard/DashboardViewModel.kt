@@ -20,9 +20,7 @@ class DashboardViewModel @Inject constructor(
     private val channel = Channel<Resource<List<Result>>>()
     var flow = channel.receiveAsFlow()
 
-    init { getRecords() }
-
-    private fun getRecords() = viewModelScope.launch { repo.getRecords().collect { channel.send(it) } }
+    fun getRecords() = viewModelScope.launch { repo.getRecords().collect { channel.send(it) } }
 
     fun deleteRecords() = repo.deleteRecords()
 }

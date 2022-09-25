@@ -1,6 +1,7 @@
 package com.example.healthcare.features_news.presentation.fragments.dashboard
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,12 +12,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.healthcare.R
-import com.example.healthcare.common.Resource
+import com.example.healthcare.common.*
 import com.example.healthcare.common.Utility.LOGOUT
 import com.example.healthcare.common.Utility.greeting
-import com.example.healthcare.common.gone
-import com.example.healthcare.common.toast
-import com.example.healthcare.common.visible
 import com.example.healthcare.databinding.FragmentDashboardBinding
 import com.example.healthcare.features_news.data.local.SPDatabase
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,9 +30,11 @@ class DashboardFragment : Fragment() {
     private val args: DashboardFragmentArgs by navArgs()
     private val viewModel: DashboardViewModel by activityViewModels()
     private lateinit var binding: FragmentDashboardBinding
+    private lateinit var mAdapter:DashboardAdapter
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?): View {
+        savedInstanceState: Bundle?
+    ): View {
         binding = FragmentDashboardBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
@@ -56,9 +56,9 @@ class DashboardFragment : Fragment() {
     }
 
     private fun init() {
-        val mAdapter = DashboardAdapter()
+        viewModel.getRecords()
+        mAdapter = DashboardAdapter()
         binding.rv.apply {
-            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
             adapter = mAdapter
         }
@@ -75,9 +75,9 @@ class DashboardFragment : Fragment() {
                     binding.ll.visible()
                     mAdapter.updateList(response.data!!)
                 }
-                is Resource.Failure -> {
+                is Resource.Error -> {
                     binding.shimmer.gone()
-                    toast(response.message.toString())
+                    toast(response.exception.getError(requireContext()))
                 }
             }
         }.launchIn(lifecycleScope)
