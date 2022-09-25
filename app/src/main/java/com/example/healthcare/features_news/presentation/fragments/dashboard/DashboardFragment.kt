@@ -69,7 +69,6 @@ class DashboardFragment : Fragment() {
 
         viewModel.flow.onEach { response ->
             response
-                .onLoading { binding.shimmer.visibility }
                 .onSuccess {
                     binding.shimmer.gone()
                     binding.ll.visible()
