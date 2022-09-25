@@ -1,6 +1,5 @@
 package com.example.healthcare.features_news.presentation.fragments.dashboard
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.healthcare.common.Resource
@@ -23,16 +22,7 @@ class DashboardViewModel @Inject constructor(
 
     init { getRecords() }
 
-    private fun getRecords() {
-        viewModelScope.launch {
-            repo.getRecords().collect { response ->
-                when (response) {
-                    is Resource.Success -> channel.send(Resource.Success(data = response.data))
-                    is Resource.Failure -> channel.send(Resource.Failure(message = response.message))
-                }
-            }
-        }
-    }
+    private fun getRecords() = viewModelScope.launch { repo.getRecords().collect { channel.send(it) } }
 
     fun deleteRecords() = repo.deleteRecords()
 }
