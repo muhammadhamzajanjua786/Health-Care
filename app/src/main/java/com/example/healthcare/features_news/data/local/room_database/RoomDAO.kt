@@ -5,21 +5,15 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.healthcare.features_news.data.local.room_database.entities.HealthCareEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RoomDAO {
 
-    /***********************************************/
-    /******************HEALTH_CARE******************/
-    /***********************************************/
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(data: List<HealthCareEntity>)
+    suspend fun insertRecords(data: List<HealthCareEntity>)
     @Query("SELECT * FROM tableHealthCare")
-    fun get(): List<HealthCareEntity>
-
-    @Query("SELECT COUNT(id) FROM tableHealthCare")
-    fun count():Int
-
+    suspend fun getRecords(): List<HealthCareEntity>
     @Query("DELETE FROM tableHealthCare")
-    suspend fun delete()
+    suspend fun deleteRecords()
 }

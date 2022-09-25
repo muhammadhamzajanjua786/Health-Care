@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.healthcare.R
-import com.example.healthcare.core.utils.AppUtils.showToast
+import com.example.healthcare.common.toast
 import com.example.healthcare.databinding.FragmentLoginBinding
 import com.example.healthcare.features_news.data.local.SPDatabase
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,7 +53,7 @@ class LoginFragment : Fragment() {
             spDatabase.setEmail(email)
             val action = LoginFragmentDirections.navigateToDashboardFragment(email)
             findNavController().navigate(action)
-            showToast(requireContext(), "Login Successful")
+            toast(getString(R.string.login_successful))
         }
     }
 }

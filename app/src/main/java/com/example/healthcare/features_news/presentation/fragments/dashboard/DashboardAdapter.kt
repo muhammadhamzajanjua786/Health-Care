@@ -1,6 +1,5 @@
 package com.example.healthcare.features_news.presentation.fragments.dashboard
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -8,12 +7,12 @@ import com.example.healthcare.databinding.ItemRvBinding
 import com.example.healthcare.features_news.data.remote.response.Result
 
 class DashboardAdapter(
-    private val context: Context,
-    private val list: List<Result>,
-    private val onClick:OnItemClickListener
+    private val list: ArrayList<Result> = ArrayList(),
 ) : RecyclerView.Adapter<DashboardAdapter.NewsViewHolder>() {
 
-    inner class NewsViewHolder(val binding: ItemRvBinding) :
+    var onItemClick: ((result: Result) -> Unit)? = null
+
+    inner class NewsViewHolder(private val binding: ItemRvBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(data: Result) {
             binding.apply {
@@ -36,14 +35,16 @@ class DashboardAdapter(
 
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         holder.bind(list[position])
-        holder.itemView.setOnClickListener { onClick.setOnItemClickListener(list[position]) }
+        holder.itemView.setOnClickListener { onItemClick?.invoke(list[position]) }
     }
 
     override fun getItemCount(): Int {
         return list.size
     }
 
-    interface OnItemClickListener {
-        fun setOnItemClickListener(data: Result)
+    fun updateList(data:List<Result>) {
+        list.clear()
+        list.addAll(data)
+        notifyDataSetChanged()
     }
 }

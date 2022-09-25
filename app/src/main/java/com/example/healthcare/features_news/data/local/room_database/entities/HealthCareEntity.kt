@@ -6,8 +6,7 @@ import com.example.healthcare.features_news.data.remote.response.Result
 
 @Entity(tableName = "tableHealthCare")
 data class HealthCareEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    @PrimaryKey(autoGenerate = false)
     val name: String,
     val dose: String,
     val strength: String

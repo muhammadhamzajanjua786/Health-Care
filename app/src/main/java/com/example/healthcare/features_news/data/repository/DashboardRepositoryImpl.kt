@@ -1,56 +1,38 @@
 package com.example.healthcare.features_news.data.repository
 
-import android.content.Context
-import com.example.healthcare.core.utils.ApiResponse
-import com.example.healthcare.core.utils.AppUtils.ERROR_MESSAGE
-import com.example.healthcare.core.utils.AppUtils.SUCCESS
-import com.example.healthcare.core.utils.AppUtils.isNetworkAvailable
-import com.example.healthcare.features_news.data.local.room_database.RoomDAO
-import com.example.healthcare.features_news.data.remote.ApiService
-import com.example.healthcare.features_news.data.remote.response.Result
+import com.example.healthcare.common.Resource
+import com.example.healthcare.domain.repository.HealthCareRepository
+import com.example.healthcare.features_news.data.local.LocalDataSource
+import com.example.healthcare.features_news.data.remote.RemoteDataSource
+import com.example.healthcare.features_news.data.remote.mapToEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 class DashboardRepositoryImpl @Inject constructor(
-    private val apiService: ApiService,
-    private val dao: RoomDAO,
-    private val context: Context) {
+    private val localDataSource: LocalDataSource,
+    private val remoteDataSource: RemoteDataSource
+) : HealthCareRepository {
 
-    operator fun invoke(): Flow<ApiResponse<List<Result>>> = flow {
-        emit(ApiResponse.Loading)
+    fun deleteRecords() = CoroutineScope(Dispatchers.IO).launch { localDataSource.deleteRecords() }
 
-        val job = CoroutineScope(Dispatchers.IO).async { dao.count() }
-        if (job.await() > 0) {
-            val job =
-                CoroutineScope(Dispatchers.IO).async { dao.get().map { it.toResult() } }
-            emit(ApiResponse.Success(data = job.await()))
+    override suspend fun getRecords() = channelFlow {
+        val dbSource = localDataSource.getRecords()
+        if (dbSource.isNotEmpty()) {
+            channel.send(Resource.Success(data = dbSource.map { it.toResult() }))
         } else {
-            if (isNetworkAvailable(context)) {
-                try {
-                    val response = apiService.getData()
-                    if (response.isSuccessful) {
-                        val data = response.body()?.results ?: emptyList()
-                        emit(ApiResponse.Success(data = data, SUCCESS))
-                        CoroutineScope(Dispatchers.IO).launch { dao.insert(data.map { it.toResult() }) }
+            remoteDataSource.getRecords().collect { response ->
+                when (response) {
+                    is Resource.Success -> {
+                        send(Resource.Success(data = response.data!!.results))
+                        localDataSource.insertRecords(response.data.results.map { it.mapToEntity() })
                     }
-                } catch (e: HttpException) {
-                    emit(ApiResponse.Failure(message = "Oops, something went wrong!"))
-                } catch (e: IOException) {
-                    emit(ApiResponse.Failure(message = ERROR_MESSAGE))
+                    is Resource.Failure -> send(Resource.Failure(message = response.message))
                 }
-            } else
-                emit(ApiResponse.Failure(message = ERROR_MESSAGE))
+            }
         }
-    }
-
-    fun deleteData() {
-        CoroutineScope(Dispatchers.IO).launch { dao.delete() }
     }
 }

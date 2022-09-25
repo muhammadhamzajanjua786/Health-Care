@@ -1,13 +1,9 @@
 package com.example.healthcare.features_news.presentation.fragments.dashboard
 
-import android.content.Context
-import android.view.View
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.healthcare.core.utils.ApiResponse
-import com.example.healthcare.core.utils.AppUtils.enableShimmer
-import com.example.healthcare.core.utils.AppUtils.showToast
-import com.example.healthcare.databinding.FragmentDashboardBinding
+import com.example.healthcare.common.Resource
 import com.example.healthcare.features_news.data.remote.response.Result
 import com.example.healthcare.features_news.data.repository.DashboardRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,32 +18,22 @@ class DashboardViewModel @Inject constructor(
     private val repo: DashboardRepositoryImpl
 ) : ViewModel() {
 
-    private val channel = Channel<List<Result>>()
+    private val channel = Channel<Resource<List<Result>>>()
     var flow = channel.receiveAsFlow()
 
-    fun getData(context: Context, binding: FragmentDashboardBinding) {
+    init { getRecords() }
+
+    private fun getRecords() {
+        Log.d("getRecords", "Called from ViewModel")
         viewModelScope.launch {
-            repo().collect { response ->
+            repo.getRecords().collect { response ->
                 when (response) {
-                    is ApiResponse.Loading -> {
-                        enableShimmer(true, binding)
-                    }
-                    is ApiResponse.Success -> {
-                        binding.ll.visibility = View.VISIBLE
-                        enableShimmer(false, binding)
-                        response.data?.let {
-                            channel.send(it)
-                        }
-                    }
-                    is ApiResponse.Failure -> {
-                        showToast(context, response.message.toString())
-                        enableShimmer(false, binding)
-                        binding.ll.visibility = View.VISIBLE
-                    }
+                    is Resource.Success -> channel.send(Resource.Success(data = response.data))
+                    is Resource.Failure -> channel.send(Resource.Failure(message = response.message))
                 }
             }
         }
     }
 
-    fun deleteData() = repo.deleteData()
+    fun deleteRecords() = repo.deleteRecords()
 }

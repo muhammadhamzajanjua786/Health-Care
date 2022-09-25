@@ -18,7 +18,6 @@ data class Result(
 
     fun toResult():HealthCareEntity {
         return HealthCareEntity(
-            id = 0,
             name = name,
             dose = dose,
             strength = strength

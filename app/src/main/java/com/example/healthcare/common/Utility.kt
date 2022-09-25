@@ -1,4 +1,4 @@
-package com.example.healthcare.core.utils
+package com.example.healthcare.common
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -9,15 +9,11 @@ import android.widget.Toast
 import com.example.healthcare.databinding.FragmentDashboardBinding
 import java.util.*
 
-object AppUtils {
+object Utility {
 
     const val SUCCESS = "Success"
     const val LOGOUT = "Logout."
     const val ERROR_MESSAGE = "Couldn't reach server, check your internet connection and try again!"
-
-    fun showToast(context: Context, message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-    }
 
     fun enableShimmer(isShown: Boolean, binding: FragmentDashboardBinding) {
         if (isShown) {
